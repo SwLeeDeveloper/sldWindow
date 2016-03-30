@@ -1,1 +1,3 @@
 # sldWindow
+Golang Gxui 로 어떻게든 해보려고 합니다...
+허접 합니다..
