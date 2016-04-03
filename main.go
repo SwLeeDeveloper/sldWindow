@@ -1,75 +1,95 @@
-/*
-screenWidth 120
-screenHeight 160
-map 114
-stone 6
-*/
+/***********************************************
+** sldWindow 단순한 라벨이랑 text 버튼입니다
+** By SwLee
+***********************************************/
+
 package main
 
 import (
-	"fmt"
-	"image"
-	"image/draw"
-	"os"
-
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
+	"github.com/google/gxui/math"
 	"github.com/google/gxui/samples/flags"
-	"github.com/nfnt/resize"
-	_ "golang.org/x/image/bmp"
 )
 
 func appMain(driver gxui.Driver) {
+
 	var theme = flags.CreateTheme(driver)
 
-	////////board
-	var fd_board, fd_err_board = os.Open("image/board.bmp")
-	if fd_err_board != nil {
-		fmt.Printf("Failed to open image : %v\n", fd_err_board)
-		os.Exit(1)
-	}
+	//임시.
+	var pen1 = gxui.CreatePen(1, gxui.Red90)
+	var pen2 = gxui.CreatePen(1, gxui.Blue60)
 
-	var img_src_board, _, img_err_board = image.Decode(fd_board)
-	if img_err_board != nil {
-		fmt.Printf("Failed to read image : %v\n", img_err_board)
-		os.Exit(1)
-	}
-	var img_src_board_resize = resize.Resize(456, 456, img_src_board, resize.Lanczos3)
+	//layout := theme.CreateLinearLayout()
+	//var layout gxui.LinearLayout
+	var layout = theme.CreateTableLayout()
+	layout.SetGrid(10, 10)
 
-	var img_board = theme.CreateImage()
-	// Copy the image to a RGBA format before handing to a gxui.Texture
-	var rgba_board = image.NewRGBA(img_src_board_resize.Bounds())
-	draw.Draw(rgba_board, img_src_board_resize.Bounds(), img_src_board_resize, image.ZP, draw.Src)
-	var texture_board = driver.CreateTexture(rgba_board, 1)
-	img_board.SetTexture(texture_board)
+	///// row 1
+	var label1_1 = theme.CreateLabel()
+	label1_1.SetText("IP : ")
+	label1_1.SetColor(gxui.White)
+	label1_1.SetMargin(math.Spacing{L: 10, R: 10, T: 10, B: 10})
+	label1_1.SetHorizontalAlignment(gxui.AlignRight)
+	// column, row, horizontal span, vertical span
+	layout.SetChildAt(0, 0, 1, 1, label1_1)
 
-	////////black
-	var fd_black, fd_err_black = os.Open("image/black.bmp")
-	if fd_err_black != nil {
-		fmt.Printf("Failed to open image : %v\n", fd_err_black)
-		os.Exit(1)
-	}
+	var txt1_1 = theme.CreateTextBox()
+	txt1_1.SetTextColor(gxui.Red60)
+	txt1_1.SetText("127.0.0.1")
+	layout.SetChildAt(1, 0, 1, 1, txt1_1)
 
-	var img_src_black, _, img_err_black = image.Decode(fd_black)
-	if img_err_black != nil {
-		fmt.Printf("Failed to read image : %v\n", img_err_black)
-		os.Exit(1)
-	}
-	var img_src_black_resize = resize.Resize(20, 20, img_src_black, resize.Lanczos3)
+	var label1_2 = theme.CreateLabel()
+	label1_2.SetText("PORT : ")
+	label1_2.SetColor(gxui.White)
+	label1_2.SetHorizontalAlignment(gxui.AlignRight)
+	// column, row, horizontal span, vertical span
+	layout.SetChildAt(2, 0, 1, 1, label1_2)
 
-	var img_black = theme.CreateImage()
-	// Copy the image to a RGBA format before handing to a gxui.Texture
-	var rgba_black = image.NewRGBA(img_src_black_resize.Bounds())
-	draw.Draw(rgba_black, img_src_black_resize.Bounds(), img_src_black_resize, image.ZP, draw.Src)
-	var texture_black = driver.CreateTexture(rgba_black, 1)
-	img_black.SetTexture(texture_black)
+	var txt1_2 = theme.CreateTextBox()
+	txt1_2.SetTextColor(gxui.Red60)
+	txt1_2.SetText("99999")
+	layout.SetChildAt(3, 0, 1, 1, txt1_2)
+
+	///// row 2
+	var label2_1 = theme.CreateLabel()
+	label2_1.SetText("Data : ")
+	label2_1.SetColor(gxui.White)
+	label2_1.SetHorizontalAlignment(gxui.AlignRight)
+	// column, row, horizontal span, vertical span
+	layout.SetChildAt(0, 1, 1, 1, label2_1)
+
+	var txt2_1 = theme.CreateTextBox()
+	txt2_1.SetTextColor(gxui.Red60)
+	txt2_1.SetText("Txt2")
+	layout.SetChildAt(1, 1, 6, 1, txt2_1)
+
+	var label2_2 = theme.CreateLabel()
+	label2_2.SetText("LEN : ")
+	label2_2.SetColor(gxui.White)
+	label2_2.SetHorizontalAlignment(gxui.AlignRight)
+	// column, row, horizontal span, vertical span
+	layout.SetChildAt(7, 1, 1, 1, label2_2)
+
+	var txt2_2 = theme.CreateTextBox()
+	txt2_2.SetTextColor(gxui.Red60)
+	txt2_2.SetText("Txt2")
+	layout.SetChildAt(8, 1, 1, 1, txt2_2)
+
+	var btn2 = theme.CreateButton()
+	btn2.SetBorderPen(pen2)
+	btn2.SetText("Send2")
+	layout.SetChildAt(9, 1, 1, 1, btn2)
 
 	///// window
-	var window = theme.CreateWindow(img_src_board_resize.Bounds().Dx(), img_src_board_resize.Bounds().Dy(), "Sw Lee Developer")
-	window.AddChild(img_board)
-	window.AddChild(img_black)
+	var window = theme.CreateWindow(700, 300, "Sw Lee Developer")
 	window.SetScale(flags.DefaultScaleFactor)
+
+	window.SetBorderPen(pen1)
+	window.AddChild(layout)
+
 	window.OnClose(driver.Terminate)
+
 }
 
 func main() {
